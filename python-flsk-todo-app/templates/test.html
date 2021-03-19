@@ -18,17 +18,13 @@
              <script type="text/javascript"
          src="{{ url_for('static', filename='js/commons/adv/advgeneral.js') }}"></script>
     <script type="text/javascript">
-     function clickMe() {
-         
-    	var root = $(document);
-    	var zoneMap = {};
-    	$.each(root.find("input"), function(key, field) {
-    		var jfield = $(field);
-    		var name = jfield.attr("name");
-            zoneMap[name] = jfield;
-    	});
-    	
-		
+     function clickMe() { 
+         var url ="/_get_value"
+    	 var request = advAjaxGetRequest("query");
+		 $.post(url, request, function (response, status) {
+		     if (status == "success") {
+                advAjaxSetResponse("query", response);   
+		     }
      }
      
       $(document).ready(function() {
@@ -63,15 +59,17 @@
       <div class="header">
         <h3 class="text-muted">Create a pretty table</h3>
       </div>
-
-      <div>
-            <tr>
-              	<td class="queryLabel">
-    				進出口轉別&nbsp;:&nbsp;
-                    <s:select name="indicatorType" list=" #{ 'I':'I 進口', 'T':'T 轉運', 'L':'L 物流' }" cssStyle="width: 80px;" />
-    				<div class="acod">desc:進出口轉別 chk(query,mrgexam,senddecl,sendman):string(1..1) tr:upper to:query;mrgexam;senddecl;sendman;send mod:mrgexam;senddecl;sendman bi:keep</div>
-                </td>
-            </tr>
+       <div>
+        <tr>
+        <td>
+            <select id="sfs" name="sfsname">
+              <option value="1">第一項</option>
+              <option value="2">第二項</option>
+              <option value="3">第三項</option>
+            </select>
+        </td>
+        </tr>
+    </div>
          <button type="button" onclick="clickMe();">Click Me!</button>
         <p>Number of rows</p>
         <input type="text" size="5" name="a" value="2">

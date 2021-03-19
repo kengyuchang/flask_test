@@ -28,6 +28,17 @@ def get_table():
                    my_table=json.loads(df.to_json(orient="split"))["data"],
                    columns=[{"title": str(col)} for col in json.loads(df.to_json(orient="split"))["columns"]])
 
+@app.route('/_get_value')
+def _get_value():
+    a = request.args.get('a', type=int)
+    b = request.args.get('b', type=int)
+
+    df = pd.DataFrame(np.random.randint(0, 100, size=(a, b)))
+
+    return jsonify(number_elements=a * b,
+                   my_table=json.loads(df.to_json(orient="split"))["data"],
+                   columns=[{"title": str(col)} for col in json.loads(df.to_json(orient="split"))["columns"]])
+
 @app.route('/_get_mstable')
 def getMstable():
     a = request.args.get('a', type=int)
