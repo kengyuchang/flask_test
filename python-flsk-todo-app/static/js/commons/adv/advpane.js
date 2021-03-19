@@ -643,7 +643,7 @@ function advPaneRegister(root) {
 		var jmain = root.find("#main");
 		var jhistDlg = $("<div id='_advHistDlg_' title='選擇歷程'><table class='ctv'></table></div>");
 		jmain.append(jhistDlg);
-		jhistDlg.dialog({ autoOpen: false, modal: true, width: 160, height: 200 });
+		//jhistDlg.dialog({ autoOpen: false, modal: true, width: 160, height: 200 });
 		advPaneBindKey("Y");
 	}
 	// 找不到主視窗就結束啟動程序

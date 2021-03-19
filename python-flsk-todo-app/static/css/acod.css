@@ -1,0 +1,103 @@
+
+div .acod {
+	display: none;
+}
+div .pane {
+	position: relative;
+	display: none;
+}
+
+.ctvTitle {
+	background-color: #cfe9ff;
+	color: #26598c;
+	font-weight: bolder;
+	border-style: solid;
+	border-width: 1px;
+	border-color:  #687480;
+}
+
+table.ctv {
+	border-collapse: collapse;
+}
+
+table.ctv th {
+	background-color: #cfe9ff;
+	color: #26598c;
+	font-weight: bolder;
+	border-style: solid;
+	border-width: 1px;
+	border-color:  #687480;
+}
+
+table.ctv td {
+	border-style: solid;
+	border-width: 1px;
+	border-color:  #687480;
+}
+
+td.ctv {
+	background-color: #cfe9ff;
+	color: #26598c;
+	font-weight: bolder;
+}
+
+table.ctv .query {
+	background-color: #f5f5f5;
+	border-style: none;
+}
+
+table.ctv .hoverRow {
+	background-color: #d1e5f5;
+	}
+
+table.ctv .selectedRow {
+	background-color: #fbec88;
+}
+
+.btnFixed {
+	width:125px;
+	background-color: white;
+	/*height:20px;
+	font-size:12px;*/
+}
+
+.bthFreeWidth {
+	/*width:250px;*/
+	background-color: white;
+	/*height:20px;
+	font-size:12px;*/
+}
+
+div.mFramL {
+    width:  990px;
+    height: 480px;
+}
+
+div.bFramL {
+    width:  990px;
+    height: 60px;
+}
+
+div.mFramS {
+    width:  700px;
+    height: 480px;
+}
+
+div.bFramS {
+    width:  700px;
+    height: 60px;
+}
+
+div.sFramL {
+	width: 990px;
+	height: 30px;
+}
+
+div.sFramS {
+	width: 700px;
+	height: 30px;
+}
+
+div.framView {
+	border: 3px coral solid;
+}
