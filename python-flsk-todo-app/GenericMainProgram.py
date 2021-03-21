@@ -14,14 +14,6 @@ from email.mime.text import MIMEText
 import logging
 from logging.handlers import RotatingFileHandler
 
-log_filename = datetime.datetime.now().strftime("D:/python/log/%Y-%m-%d.log")
-#log_filename = datetime.datetime.now().strftime("D:/python/log/tk%Y-%m-%d_%H_%M_%S.log")
-
-logging.basicConfig(filename=log_filename,level=logging.DEBUG,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%Y-%m-%d %H:%M',
-                   )
-
 
 class GenericMainProgram:
     '''

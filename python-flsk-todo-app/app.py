@@ -8,6 +8,8 @@ import json
 app = Flask(__name__)
 
 
+avengers =[]
+
 @app.route('/')
 def index():
 	return render_template('index.html')
@@ -28,8 +30,16 @@ def get_table():
                    my_table=json.loads(df.to_json(orient="split"))["data"],
                    columns=[{"title": str(col)} for col in json.loads(df.to_json(orient="split"))["columns"]])
 
-@app.route('/_get_value')
-def _get_value():
+@app.route('/getfuncb')
+def getFuncB():
+    results = []
+    
+    results={"b":"20"}
+
+    return jsonify(results)
+
+@app.route('/_get_funca')
+def getFuncA():
     a = request.args.get('a', type=int)
     b = request.args.get('b', type=int)
 
@@ -62,5 +72,23 @@ def getMstable():
                    my_table=json.loads(df.to_json(orient="split"))["data"],
                    columns=[{"title": str(col)} for col in json.loads(df.to_json(orient="split"))["columns"]])
 
+
+@app.route('/avengers', methods=['GET'])
+def avengers_properties():
+    results = []
+    nationality = ""
+    if 'nationality' in request.args:
+        nationality = request.args['nationality']
+    else:
+        print("no hero")    
+
+    for avenger in avengers:
+        if avenger['nationality'] == nationality:
+            results.append(avenger)
+
+
+    return jsonify(results)
+
 if __name__ == '__main__':
-	app.run(host='0.0.0.0',port='5000',debug=True)
+    app.debug = True
+    app.run(host='localhost', port=5000)
