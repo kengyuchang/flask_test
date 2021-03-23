@@ -32,9 +32,19 @@ def get_table():
 
 @app.route('/getfuncb')
 def getFuncB():
-    results = []
+    #results = [{"b":"20","sfsname":"2"},{}]
     
-    results={"b":"20"}
+    results={
+             "b":"20"
+             ,"a":"20"
+             ,"sfsname":"2"
+             ,"if05Begin":"0"
+             ,"if05Total":"1"
+             ,"if05Count":"1"
+             ,"if05View":""
+             ,"if05Type":""
+             ,"if05ColRtnMsg":["2xxx"]
+             }
 
     return jsonify(results)
 
@@ -66,7 +76,7 @@ def getMstable():
             where npr.停用 ='N'\
             order by 專案負責人\
         """
-    conn =GenericMainProgram.getDBConnection('123', 'OUTBOUND', 15)
+    conn =GenericMainProgram.getDBConnection('3-123', 'OUTBOUND', 15)
     df =pd.read_sql(sql, conn)
     return jsonify(number_elements=a * b,
                    my_table=json.loads(df.to_json(orient="split"))["data"],
