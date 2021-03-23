@@ -39,11 +39,13 @@ def getFuncB():
              ,"a":"20"
              ,"sfsname":"2"
              ,"if05Begin":"0"
-             ,"if05Total":"1"
-             ,"if05Count":"1"
+             ,"if05Total":"5"
+             ,"if05Count":"5"
              ,"if05View":""
              ,"if05Type":""
-             ,"if05ColRtnMsg":["2xxx"]
+             ,"if05ColRtnMsg":["1xxx","2xxx","3xxx","4xxx","5xxx"]
+             ,"if05ColRtnMsg2":["1xxx","2xxx","3xxx","4xxx","5xxx"]
+             ,"if05ColRecvNote":["N","Y","N","Y","N"]
              }
 
     return jsonify(results)

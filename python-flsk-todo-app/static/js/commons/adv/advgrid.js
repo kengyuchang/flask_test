@@ -799,10 +799,14 @@ function advGridRegisterBaseConf(grid) {
 	// private 將 grid 樣版中欄位有個別指定 to, fr, bi 者，分解出待傳屬性
 	jtmpl = $(grid["tmpl"]);
 	var baseConf = grid["baseConf"] = {};
-	$.each(jtmpl.find("input,select,textarea,label"), function (key, field) {
+	$.each(jtmpl.find("input,select,textarea,label,textfield"), function (key, field) {
 		var jfield = $(field);
 		if (jfield.attr("name")) {
 			var name = advGridGetNameSkipArray(jfield.attr("name"));
+			advAjaxRegisterField(jfield, name, baseConf, null, "*");
+		}
+		if (jfield.attr("id")) {
+			var name = advGridGetNameSkipArray(jfield.attr("id"));
 			advAjaxRegisterField(jfield, name, baseConf, null, "*");
 		}
 	});

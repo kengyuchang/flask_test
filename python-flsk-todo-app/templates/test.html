@@ -23,7 +23,9 @@
             var request = advAjaxGetRequest("query");
             $.getJSON(url, request, function (response, status) {
     	    if (status == "success") {
-                advAjaxSetResponse("query", response);   
+                advAjaxSetResponse("query", response); 
+                var i =10;
+                advConfigShowErrorMessage("序號"+(i+1)+"，組別5人數只能為整數!",-1);
     	    }
         });
       }
@@ -90,8 +92,8 @@
         </tr>
         <tr>
             <td><label style="display: inline-block; width: 70px;" id="seq"></label></td>
-            <td><label style="display: inline-block; width: 70px;" id="rtnMsg"></label></td>
-			<td><s:textfield name="rtnMsg" cssClass="query" readonly="true" cssStyle="width: 438px;" /></td>
+			<td><label style="display: inline-block; width: 70px;" name="rtnMsg"></label></td>
+			<td><label style="display: inline-block; width: 100px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<s:checkbox  name="recvNote" tabindex="-1"/>&nbsp;</label></td>
 	    </tr>
         </table>
         <div class="acod">grid:tmpl(if05)</div>
@@ -118,7 +120,8 @@
         <s:hidden name="libraCopy" />
         <div class="acod"> bi:query</div>
     </div>
-
+    <input id="statusMsg" type="text" class="msgText error" readonly="readonly"></input>
+    </div>
   </body>
   <script type="text/javascript">
   advConfigRegister();
