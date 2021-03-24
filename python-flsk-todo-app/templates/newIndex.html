@@ -20,13 +20,16 @@
     <script type="text/javascript">
     function clickMe() { 
         var url ='/getfuncb'
-            var request = advAjaxGetRequest("query");
-            $.getJSON(url, request, function (response, status) {
-    	    if (status == "success") {
+        if (advConfigModCheck("query", true)){
+				return;
+			}
+        var request = advAjaxGetRequest("query");
+        $.getJSON(url, request, function (response, status) {
+            if (status == "success") {
                 advAjaxSetResponse("query", response); 
                 var i =10;
                 advConfigShowErrorMessage("查詢完成!",0);
-    	    }
+            }
         });
       }
     function showZonePane(src) {
@@ -75,20 +78,20 @@
                 </td>
             </tr>
             <button type="button" onclick="clickMe();">funcB!</button>
-            <p>Number of rows</p>
-            <input type="text" size="5" name="a" value="2">
-            <div class="acod"> bi:query</div>
-            <p>Number of columns</p>
-            <input type="text" size="5" name="b" value="4">
-            <div class="acod"> bi:query</div>
-            <p><a href="javascript:void();" id="calculate">get a pretty table</a></p>
-            <p>Result</p>
-            <p>Number of elements:</p>
-                <span id="elements">Hallo</span><br>
-            <table id="a_nice_table">Here should be a table</table>
         </div>
+        <table border="0">
+            <tr>
+                <td class="queryLabel">
+                    專案代號&nbsp;:&nbsp;        		
+                </td>
+                <td>
+                    <input type="text"  name="qProjectNo" id="qProjectNo" size="20" maxlength="20" >
+                    <div class="acod">desc:專案代號 chk(query):string(1..20) tr:upper  to:query bi:keep</div>
+                </td>
+            </tr>
+        </table>
 
-        <table id="IF05_Table">
+        <table id="grid01">
         <tr>
             <th><label style="display: inline-block; width: 70px;">序號</label></th>
 			<th><label style="display: inline-block; width: 640px;">專案代號</label></th>
@@ -98,17 +101,17 @@
 			<td nowrap><label ondblclick="showZonePane(this);" style="display: inline-block; width: 160px;" name="projectNo"></label></td>
 	    </tr>
         </table>
-        <div class="acod">grid:tmpl(if05)</div>
+        <div class="acod">grid:tmpl(if01)</div>
         <div style="position: relative; overflow: hidden;">
-            <table class="ctv" name="if05"></table>
-            <div class="acod">grid:fixrow(if05)</div>
+            <table class="ctv"></table>
+            <div class="acod">grid:fixrow(if01)</div>
         </div>
         <div style="position: relative; width: 700px; height: 310px; overflow-x: auto; overflow-y: scroll;">
-                    <table class="ctv" name="if05" id="if05"></table>
-                    <div class="acod">grid:table(if05);attr(reqAll);pgrow(0)  fr:query bi:update</div>
+                    <table class="ctv" ></table>
+                    <div class="acod">grid:table(if01);attr(reqAll);pgrow(0)  fr:query bi:update</div>
         </div>
         <div class="ctvTitle" style="position: relative; width: 700px; text-align: right;">
-            共&nbsp;<span id="edCnt"></span><div class="acod">grid:rowcnt(if05)</div>&nbsp;筆&nbsp;
+            共&nbsp;<span id="edCnt"></span><div class="acod">grid:rowcnt(if01)</div>&nbsp;筆&nbsp;
         </div>
         <div style="position: relative; width: 290px; text-align:left;">
         </div>

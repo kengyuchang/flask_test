@@ -18,6 +18,10 @@ def index():
 def test():
 	return render_template('test.html')
 
+@app.route('/test01')
+def test01():
+	return render_template('test01.html')
+
 
 @app.route('/_get_table')
 def get_table():
@@ -30,25 +34,61 @@ def get_table():
                    my_table=json.loads(df.to_json(orient="split"))["data"],
                    columns=[{"title": str(col)} for col in json.loads(df.to_json(orient="split"))["columns"]])
 
+@app.route('/getfuncd')
+def getFuncD():
+    results={}
+    results={
+      "data": [
+        [
+          "Tiger Nixon",
+          "System Architect",
+          "Edinburgh",
+          "5421",
+          "2011/04/25",
+          "$320,800"
+        ],
+        [
+          "Garrett Winters",
+          "Accountant",
+          "Tokyo",
+          "8422",
+          "2011/07/25",
+          "$170,750"
+        ]]
+    }
+    return jsonify(results)
+
 @app.route('/getfuncb')
 def getFuncB():
     #results = [{"b":"20","sfsname":"2"},{}]
-    
-    results={
-             "b":"20"
-             ,"a":"20"
-             ,"sfsname":"2"
-             ,"if05Begin":"0"
-             ,"if05Total":"5"
-             ,"if05Count":"5"
-             ,"if05View":""
-             ,"if05Type":""
-             ,"if05ColRtnMsg":["1xxx","2xxx","3xxx","4xxx","5xxx"]
-             ,"if05ColRtnMsg2":["1xxx","2xxx","3xxx","4xxx","5xxx"]
-             ,"if05ColRecvNote":["N","Y","N","Y","N"]
-             }
+    sql="""    
+			select npr.專案代號 \
+			from  OUTBOUND.[dbo].[Notice_Project_Registry] npr\
+			left join  OUTBOUND.[dbo].[Notice_SMS] sms on npr.專案代號 = sms.專案代號\
+			left join  OUTBOUND.[dbo].Notice_App_Push aph on npr.專案代號 = aph.專案代號\
+        where npr.停用 ='N'\
+        order by 專案負責人\
+    """
+    conn =GenericMainProgram.getDBConnection('3-123', 'OUTBOUND', 15)
+    df =pd.read_sql(sql, conn)
+    cc=df['if05ColProjectNo'].values.tolist()
+    #dic=GenericMainProgram.executeSQLInOut(sql,'3-123', 'OUTBOUND', 15)
+    #df= pd.DataFrame(dic)
+    rename_dic={"專案代號":"if05ColProjectNo"}
+    res2 =df.rename(rename_dic, axis=1).to_dict()
+    res2["if05ColProjectNo"]=cc
+    res2["if05Begin"]="0"
+    res2["if05Count"]=str(df.size)
+    res2["if05Total"]=str(df.size)
+    res2["if05View"]=""
+    res2["if05Type"]=""
+    res2["sfsname"]=3
+    res2["b"]=30
+    res2["a"]=100
 
-    return jsonify(results)
+
+
+    return jsonify(res2)
 
 @app.route('/_get_funca')
 def getFuncA():

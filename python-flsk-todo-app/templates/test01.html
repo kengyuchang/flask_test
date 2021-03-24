@@ -32,27 +32,47 @@
     function showZonePane(src) {
 	    var jrow = $(src).parent().parent();
 	    var seqNo = jrow.find("#seq").text();
-    } 
+    }
+    function showTable(src) {
+        var url ='/_get_mstable'
+        var request = advAjaxGetRequest("query");
+        $.getJSON(url, request, function (response, status) {
+    	    if (status == "success") { 
+                $("#example").DataTable({
+                    data: response.my_table,
+                    columns: [
+                        { 'data': '專案代號' },
+                        { 'data': '通知方式' },
+                        { 'data': '專案說明' },
+                        { 'data': '案負責人' },
+                        { 'data': '專案開始日' },
+                        { 'data': '專案結束日' },
+                        { 'data': '停用' },
+                        { 'data': '內容' },
+                    ]
+                });
+    	    }
+        });
+    }
     $(document).ready(function() {
-        var table = null;
         $('a#calculate').bind('click', function() {
             $.getJSON('/_get_mstable', {
                 a: $('input[name="a"]').val(),
                 b: $('input[name="b"]').val()
             }, function(data) {
                 $("#elements").text(data.number_elements);
-                if (table !== null) {
-                    table.destroy();
-                    table = null;
-                    $("#a_nice_table").empty();
-                }
-                table = $("#a_nice_table").DataTable({
-                    data: data.my_table,
-                    columns: data.columns
+                $("#example").DataTable({
+                    data: data.data
                 });
             });
             return false;
         });
+         var table = $('#example').DataTable(destroy=true);
+     
+        $('#example tbody').on( 'click', 'button', function () {
+            var data = table.row( $(this).parents('tr') ).data();
+            alert( data[0] +"'s salary is: "+ data[ 5 ] );
+        } );
     });
  
     </script>
@@ -74,7 +94,7 @@
                     <div class="acod"> bi:query</div>
                 </td>
             </tr>
-            <button type="button" onclick="clickMe();">funcB!</button>
+            <button type="button" onclick="showTable();">FuncA!</button>
             <p>Number of rows</p>
             <input type="text" size="5" name="a" value="2">
             <div class="acod"> bi:query</div>
@@ -85,33 +105,37 @@
             <p>Result</p>
             <p>Number of elements:</p>
                 <span id="elements">Hallo</span><br>
-            <table id="a_nice_table">Here should be a table</table>
         </div>
+        
+       <table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>專案代號</th>
+                <th>通知方式</th>
+                <th>專案說明</th>
+                <th>案負責人</th>
+                <th>專案開始日</th>
+                <th>專案結束日</th>
+                <th>停用</th>
+                <th>內容</th>
+                <th>botton</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>專案代號</th>
+                <th>通知方式</th>
+                <th>專案說明</th>
+                <th>案負責人</th>
+                <th>專案開始日</th>
+                <th>專案結束日</th>
+                <th>停用</th>
+                <th>內容</th>
+                <th>botton</th>
+            </tr>
+        </tfoot>
+    </table>
 
-        <table id="IF05_Table">
-        <tr>
-            <th><label style="display: inline-block; width: 70px;">序號</label></th>
-			<th><label style="display: inline-block; width: 640px;">專案代號</label></th>
-        </tr>
-        <tr>
-            <td nowrap><label style="display: inline-block; width: 70px;" id="seq"></label></td>
-			<td nowrap><label ondblclick="showZonePane(this);" style="display: inline-block; width: 160px;" name="projectNo"></label></td>
-	    </tr>
-        </table>
-        <div class="acod">grid:tmpl(if05)</div>
-        <div style="position: relative; overflow: hidden;">
-            <table class="ctv" name="if05"></table>
-            <div class="acod">grid:fixrow(if05)</div>
-        </div>
-        <div style="position: relative; width: 700px; height: 310px; overflow-x: auto; overflow-y: scroll;">
-                    <table class="ctv" name="if05" id="if05"></table>
-                    <div class="acod">grid:table(if05);attr(reqAll);pgrow(0)  fr:query bi:update</div>
-        </div>
-        <div class="ctvTitle" style="position: relative; width: 700px; text-align: right;">
-            共&nbsp;<span id="edCnt"></span><div class="acod">grid:rowcnt(if05)</div>&nbsp;筆&nbsp;
-        </div>
-        <div style="position: relative; width: 290px; text-align:left;">
-        </div>
         <s:hidden name="_advPaneBackup_" />
         <s:hidden name="libraCopy" />
         <div class="acod"> bi:query</div>
