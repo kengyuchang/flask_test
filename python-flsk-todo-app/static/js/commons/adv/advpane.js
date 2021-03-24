@@ -388,6 +388,10 @@ function advPaneGoBack(chk) {
 			}
 			// 找回當初作業的 action
 			var action = lastBackup["action"];
+			//若報單號碼與當初查詢的不同，返回查詢新報單
+			if ($('#declNo').val() != undefined || $('#declNo').val() != null  &&  $('#declNo').val() != "") {
+			     lastBackup["keep"]["declNo"] = $('#declNo').val();
+			   }
 			// 設定為預備回復狀態
 			lastBackup["restoring"] = true;
 			var text = JSON.stringify(backupList);

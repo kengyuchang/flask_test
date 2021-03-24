@@ -47,6 +47,24 @@ def getFuncB():
 
     return jsonify(res2)
 
+@app.route('/getfunca')
+def getFuncA():
+    results={
+             "b":"20"
+             ,"a":"20"
+             ,"sfsname":"2"
+             ,"if01Begin":"0"
+             ,"if01Total":"1"
+             ,"if01Count":"1"
+             ,"if01View":""
+             ,"if01Type":""
+             ,"if01ColProjectNo":["2xxx"]
+             }
+
+
+
+    return jsonify(results)
+
 
 if __name__ == '__main__':
     app.debug = True

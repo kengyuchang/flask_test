@@ -1,22 +1,23 @@
 
 /*
  * Advanced Configuration On Document for Selection DeclNo, MAWB/HAWB 選擇報單號碼，主分號程式庫
- * 版本: 0.2.0
+ * 版本: 0.2.0.3
  *  
  * 修正點選報單號碼後自動查詢。by tony。 
  * 修正<tr>、<td> 不連動卷軸。by tony。 
+ * 20160217  by tony  不要使用session了
  */
 
 	var advDeclDataMap;
 	var adv_Ctrl_Flag = false; 
-	
+
 	// key 說明
 	//   curType: declNo, mhawb 目前選擇報單號碼或主分號
 	//   declNo:  使用過的報單號碼列表
 	//   mhawb:   使用過的主分號列表
 
 $(document).bind("keydown",(function(event){
-	
+
 	// 13 / 108 enter => decl_no 
 	if ( ( event.keyCode == 13 || event.keyCode == 108 ) && adv_Ctrl_Flag )
 	{   
@@ -44,7 +45,7 @@ $(document).bind("keydown",(function(event){
 			$("input[name='advCodeM']:checked").focus(); 
 	}
 }));
-	
+
 /*function advDeclHover(evt) {
 	// private 滑鼠移進移出事件
 	var mode = evt.data["mode"];
@@ -52,10 +53,10 @@ $(document).bind("keydown",(function(event){
 	jrow.parent().find("tr").removeClass("hoverRow");
 	if (mode == "i")
 		jrow.addClass("hoverRow");
-}*/	
+}*/
 
 /*function advDeclKeyMoveUp(evt) {
-	
+
 	// private 操作者按了向上鍵
 	var jrowList = $("#_advSelDataDlg_ table tr");
 	var pos;
@@ -68,16 +69,16 @@ $(document).bind("keydown",(function(event){
 	}
 
 	window.event.keyCode = 0;
-	window.event.returnValue = false;	
+	window.event.returnValue = false;
 	return false;
 }*/
 
 /*function advDeclKeyMoveDown(evt) {
-	
+
 	// private 操作者按了向下鍵
 	var jrowList = $("#_advSelDataDlg_ table tr");
 	var pos;
-	
+
 	for (pos = 0; pos < jrowList.length; pos++)
 		if ($(jrowList[pos]).hasClass("hoverRow"))
 			break;
@@ -85,9 +86,9 @@ $(document).bind("keydown",(function(event){
 		$(jrowList[pos]).removeClass("hoverRow");
 		$(jrowList[pos + 1]).addClass("hoverRow");
 	}
-			
+
 	window.event.keyCode = 0;
-	window.event.returnValue = false;	
+	window.event.returnValue = false;
 	return false;
 }*/
 
@@ -106,7 +107,7 @@ function advDeclKeySel(evt) {
 	advDeclAssignData(data);
 
 	window.event.keyCode = 0;
-	window.event.returnValue = false;	
+	window.event.returnValue = false;
 	return false;
 }
 
@@ -118,10 +119,10 @@ function advDeclClickData(evt) {
 }
 
 function advDeclAssignData(data) {
-	
+
 	if ( data == undefined )
 		return;
-	
+
 	// private 選擇某一筆資料，將此資料設定到畫面上
 	var type = advDeclDataMap["curType"];
 	if (type == "declNo") {
@@ -151,7 +152,7 @@ function advDeclAssignData(data) {
 		}
 		if ( mawb.trim() == "" || hawb.trim() == "" )
 			return;
-		
+
 		for (var i = 0; i < jfieldList.length; i++) {
 			var jfield = $(jfieldList[i]);
 			jfield.val(mawb);
@@ -170,6 +171,10 @@ function advDeclChoose() {
 	// private 顯示資料選擇視窗
 	var type = advDeclDataMap["curType"];
 	var jdlg = $("#_advSelDataDlg_");
+
+	if ( type == undefined )
+		type = "declNo";
+
 	jdlg.find("[name='_advSelDataType_'][value='" + type + "']").attr("checked", true);
 	var jtbl = jdlg.find("table");
 	jtbl.empty();
@@ -182,29 +187,31 @@ function advDeclChoose() {
 		{
 			/*var line = "<tr><td style='width: 300px;' nowrap align='center'>" + advConfigTransDeclno(list[i])
 					 + "<input type='hidden' name='declNo' value='" + list[i] + "' /></td></tr>";*/
-			
+
 			if ( advConfigTransDeclno( list[i] ).trim() == "" )
 				continue;
-			
+
+			/* 20160224 取消序號 by tony
 			var space = i + 1 + "";
 			if ( space.length == 1 )
 				space = "&nbsp&nbsp&nbsp" + space;
 			else if ( space.length == 2 ) 
 				space = "&nbsp&nbsp" + space;
 			else if ( space.length == 3 ) 
-				space = "&nbsp" + space;
-			
+				space = "&nbsp" + space;*/
+			var space = "";
+
 			var line = "<tr><td>&nbsp" + space + "&nbsp<input type=\"radio\" name=\"advCode\" id=\"advCode"+ i + "\" value=\""+ list[i] +"\"";
-						
+
 			if ( _checked )
 			{
 				line =  line + " checked='checked' ";
 				_checked = false;
 			}
-			
+
 			line =  line +" ></input>"+"&nbsp&nbsp<label for=\"advCode"+ i +"\" >" + advConfigTransDeclno( list[i] ) + "</label></td></tr> ";
 			var jrow = $(line);
-			
+
 			jrow.bind("dblclick", { data: list[i] }, advDeclClickData);
 			//jrow.bind("click", { data: list[i] }, advDeclClickData);
 			//jrow.bind("mouseenter", { row: jrow, mode: "i" }, advDeclHover);
@@ -218,10 +225,10 @@ function advDeclChoose() {
 			var p = list[i].indexOf(';');
 			var mawb = p >= 0 ? list[i].substring(0, p) : list[i];
 			var hawb = p >= 0 ? list[i].substring(p + 1) : "*";
-			
+
 			/*var line = "<tr><td style='width: 150px;' nowrap align='left'>" + mawb + "</td>" + 
 						"<td style='width: 150px;' nowrap align='left'>" + hawb + "</td></tr>";*/
-			
+
 			if ( mawb.trim() == "" )
 				continue;
 
@@ -231,8 +238,8 @@ function advDeclChoose() {
 			else if ( space.length == 2 ) 
 				space = "&nbsp&nbsp" + space;
 			else if ( space.length == 3 ) 
-				space = "&nbsp" + space;			
-			
+				space = "&nbsp" + space;
+
 			var line = "<tr><td>&nbsp" + space + "&nbsp<input type=\"radio\" name=\"advCodeM\" id=\"advCodeM"+ i + "\" value=\""+ list[i] +"\"";
 
 			if ( _checked )
@@ -240,14 +247,14 @@ function advDeclChoose() {
 				line = line + " checked='checked' ";
 				_checked = false;
 			}
-			
+
 			line =  line +" ></input>"+"&nbsp&nbsp<label for=\"advCodeM"+ i +"\" >" + mawb + "  /  " + hawb + "</label></td></tr> ";
 
 			var jrow = $(line);
 			jrow.bind("dblclick", { data: list[i] }, advDeclClickData);
 			//jrow.bind("click", { data: list[i] }, advDeclClickData);
 			//jrow.bind("mouseenter", { row: jrow, mode: "i" }, advDeclHover);
-			
+
 			jtbl.append(jrow);
 		}
 	}
@@ -259,9 +266,11 @@ function advDeclTypeChanged(src) {
 	var type = $(src).val();
 	advDeclDataMap["curType"] = type;
 	advDeclChoose();
+	/* 20160217  by tony  不要使用session了
+	 * 這裡只是存入選擇的資料類型
 	var url = "SelDeclNo!setCurType";
 	var request = { type: type };
-	$.post(url, request, function (response, status) { }, "json");
+	$.post(url, request, function (response, status) { }, "json");*/
 }
 
 function advDeclClose() {
@@ -283,12 +292,38 @@ function advDeclOpen() {
 	//$(document).bind("keydown", "down", advDeclKeyMoveDown);
 	$(document).bind("keydown", "return", advDeclKeySel);
 }
-	
+
 function advDeclSel() {
 	// public 開啟選擇報單號碼對話盒
 	// if (advDeclDataMap && advDeclDataMap["load"])
 	//	 advDeclOpen(); 
 	// else {
+
+	// 20160217  by tony  不要使用session了
+	var _$historySelector = {};
+
+	 if ( window.top.header ) {
+		 _$historySelector =  $( "#historyArea", window.top.header.document );
+	 } else if ( window.opener ) { //由menu點右鍵開啟的
+		 if ( window.opener.top.header )
+			 _$historySelector = $( "#historyArea", window.opener.top.header.document );
+	 }
+	 
+	 try 
+	 {
+		 advDeclDataMap = JSON.parse( _$historySelector.text() );
+	 } catch( e )
+	 {
+		 advDeclDataMap = {};
+		 advDeclDataMap[ "load" ] = true;
+		 advDeclDataMap[ "curType" ] = "declNo";
+		 advDeclDataMap[ "declNo" ] = [];
+		 advDeclDataMap[ "mhawb" ] =  [];
+	 }
+
+	 advDeclOpen();
+	 
+	/* 20160217  by tony  不要使用session了
 		var url = "SelDeclNo!loadData";
 		var request = {};
 		$.post(url, request, function (response, status) {
@@ -300,7 +335,7 @@ function advDeclSel() {
 				advDeclDataMap["mhawb"] = response["model"]["mhawbList"];
 				advDeclOpen();
 			}
-		}, "json");
+		}, "json");*/
 	// } 
 }
 
@@ -321,10 +356,37 @@ function advDeclAdd(data, type) {
 	// 為了相容原程式，沒有改 type 時視為給 declNo
 	if (!type)
 		type = "declNo";
+
 	if (!advDeclDataMap)
-		advDeclDataMap = { type: "declNo", load: false };
+		advDeclDataMap = { curType: "declNo", load: false };
+		//advDeclDataMap = { type: "declNo", load: false };
 	if (!advDeclDataMap[type])
-		advDeclDataMap[type] = [];
+	{
+		// advDeclDataMap[type] = [];
+		// 轉換作業也要 initial 
+		// 20160217  by tony  不要使用session了
+		var _$historySelector = {};
+
+		 if ( window.top.header ) {
+			 _$historySelector =  $( "#historyArea", window.top.header.document );
+		 } else if ( window.opener ) { //由menu點右鍵開啟的
+			 if ( window.opener.top.header )
+				 _$historySelector = $( "#historyArea", window.opener.top.header.document );
+		 }
+		 
+		 try 
+		 {
+			 advDeclDataMap = JSON.parse( _$historySelector.text() );
+		 } catch( e )
+		 {
+			 advDeclDataMap = {};
+			 advDeclDataMap[ "load" ] = true;
+			 advDeclDataMap[ "curType" ] = "declNo";
+			 advDeclDataMap[ "declNo" ] = [];
+			 advDeclDataMap[ "mhawb" ] =  [];
+		 }
+	}
+
 	// 從原列表中移除相同的報單
 	var list = advDeclDataMap[type];
 	for (var i = 0; i < list.length; i++)
@@ -337,29 +399,49 @@ function advDeclAdd(data, type) {
 		}
 	// 將新增資料放在最前面
 	list.splice(0, 0, data);
-	// 新資料寫入 AP Server
+
+	// 20160217  by tony  不要使用session了
+	//加到第一個，如果存在就刪除
+	if ( type == "declNo" ) { // 報單號碼
+		advDeclDataMap["declNo"] = _.without( advDeclDataMap["declNo"], data );
+		advDeclDataMap["declNo"].unshift( data );
+	}else if ( type == "mhawb" ) { //海空運別
+		advDeclDataMap["mhawb"] = _.without( advDeclDataMap["mhawb"], data );
+		advDeclDataMap["mhawb"].unshift( data );
+	}
+
+	var _historyArea = JSON.stringify( advDeclDataMap );
+
+	if ( window.top.header ) {
+	    $( "#historyArea", window.top.header.document ).text( _historyArea );
+	} else if ( window.opener ) { //由menu點右鍵開啟的
+	if ( window.opener.top.header )
+	    $( "#historyArea", window.opener.top.header.document ).text( _historyArea );
+	}
+
+	/* 20160217  by tony  不要使用session了
 	var url = "SelDeclNo!addData";
 	var request = { type: type, data: data };
-	$.post(url, request, function (response, status) { }, "json");
+	$.post(url, request, function (response, status) { }, "json");*/
 }
-	
+
 function advDeclRegister(root) {
 	// public 啟動程序
-	
+
 	// root 一般狀況下不用傳值
 	if (!root) {
 		root = $(document);
 		advDeclBindKey("Y");
 
 		var jmain = root.find("#main");
-		
+
 		var html = "<div id='_advSelDataDlg_' title='選擇資料' style=\"overflow:hidden;\">"
 				 + "資料類別：<input type='radio' name='_advSelDataType_' value='declNo' onclick='advDeclTypeChanged(this);'/>報單號碼"
 				 + "<input type='radio' name='_advSelDataType_' value='mhawb' onclick='advDeclTypeChanged(this);'/>主分號"
 				 //+ "<table class='ctv'></table>"
 				 + "<div style=\"height:240px;overflow:auto;\"><table></table></div>"
 				 + "</div>";
-		
+
 		var jselDlg = $(html);
 		jmain.append(jselDlg);
 		jselDlg.dialog({ autoOpen: false, modal: true, width: 350, height: 300 });

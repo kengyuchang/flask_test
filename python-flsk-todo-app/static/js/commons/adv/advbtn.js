@@ -1,6 +1,6 @@
 /*
  * Advanced Configuration On Document for hotKey 快捷鍵設置
- * 版本: 0.0.9
+ * 版本: 0.1.0
  * 快捷鍵設置:
  * 	需在Button的Tag上新增name屬性
  *  名稱為btn_+需設置的HotKey名稱
@@ -32,6 +32,13 @@ $(document).bind("keydown", function(event){
  			return false;
 		};
 	}
+	
+	var title ="";
+	
+	//進口作業 按Home focus報單號碼
+	if (title == 'I' || title == 'T')
+		if (keyName == 'FPG')
+			$("#declNo1").focus();
 	
 	//輸入報單完畢，按entr 比照f6查詢。
 	if (keyName == "ENT") {

@@ -1,6 +1,6 @@
 /*
  * Advanced Configuration On Document
- * 版本: 0.4.33
+ * 版本: 0.4.41
  *
  * 異動紀錄：
  * <2012/09/27> by sam 配合關貿修改訊息顏色設定。
@@ -8,6 +8,12 @@
  * <2013/11/05> by tony 修正報單號碼複製功能。
  * <2013/11/12> by tanek focus與click都可Ctrl+v貼上報單號碼
  * <2013/11/20> by tony 取消報單號碼的防呆
+ * <2014/05/20> by tony 修正報表也能複製
+ * <2014/06/27> by Steve 修正取消報單號碼的防呆
+ * <2014/10/30> by tony 調整相容性(IE11)
+ * <2015/04/24> by tony 第二節打一個空白，自動補2個空白
+ * <2015/06/12> by tony 處理keyDown、keyUp遺失的問題。
+ * <2015/08/31> by tony 用退格鍵(backspace)回到上一欄報單欄位
  * 
  * 檢查輸入欄位內容是否有效，檢查條件置於輸入後 <div class="acod">{檢查條件}</div> 之中
  *
@@ -286,16 +292,16 @@ function advConfigVerifyText(caller, tag, text, condList) {
 		for (var i = 0; i < condList.length; i++) {
 			var cond = condList[i];
 			var type = cond[0];
-			/* <2013/11/20> by tony 取消報單號碼的防呆
+
 			if (type == "string" && !((caller == "blur" || allowEmpty) && !text)) {
 				// 檢查長度
 				if (cond[1] && text.length < cond[1])
 					return "長度少於" + cond[1] + "字元";
 				if (cond[2] && text.length > cond[2])
 					return "長度超過" + cond[2] + "字元";
-			}*/
-			//else if (type == "integer" && !((caller == "blur" || allowEmpty) && !text)) {
-			if (type == "integer" && !((caller == "blur" || allowEmpty) && !text)) {
+			}
+			else if (type == "integer" && !((caller == "blur" || allowEmpty) && !text)) {
+			//if (type == "integer" && !((caller == "blur" || allowEmpty) && !text)) {
 				// 檢查是否為數值
 				var val = parseInt(text.replace(/,/g, ""), 10);
 				var ma = text.match(/^[+\\-]?[\d,]+$/);
@@ -581,6 +587,7 @@ function advConfigTextOnFocus(evt) {
 function advConfigTextOnBlur(evt) {
 	// private 當 text 欄位失去 focus 時觸發
 	var jfield = $(evt.target);
+	var name = jfield.attr("name");
 	var text = jfield.val();
 	var trans = evt.data["tr"];
 	if (trans) {
@@ -589,7 +596,8 @@ function advConfigTextOnBlur(evt) {
 		jfield.val(text);
 	}
 	var jail = evt.data["jail"];
-	if (jail) {
+	// Steve 取消報單號碼的防呆
+	if (jail && name.indexOf("declNo") < 0) {
 		var tag = jfield[0].tagName;
 		var err = advConfigVerifyText("blur", tag, text, jail);
 		// 有錯則鎖住輸入焦點
@@ -606,20 +614,32 @@ function advConfigTextOnBlur(evt) {
 function advConfigTextOnKeyUpDown(evt) {
 	// private 當 text 收到按鍵按下或釋放時觸發
 	var auto = evt.data["auto"];
+
 	if (!auto)
 		return;
+
 	var jcurr = $(auto["curr"]);
 	var text = jcurr.val();
 	var maxlen = jcurr.attr("maxlength");
+
 	if (evt.type == "keydown") {
 		// 當在按下按鍵前，字數是要滿字數減一，則設定符合前置條件
-		auto["cond"] = (text.length == maxlen - 1 || (text.length == 1 && maxlen == 1));
+		// auto["cond"] = (text.length == maxlen - 1 || (text.length == 1 && maxlen == 1));\
+		if (evt.keyCode == 9)
+			auto.cond = false;
+		else if (!(auto.cond && text.length == maxlen))
+			auto.cond = (text.length == maxlen - 1 || text.length == maxlen);
 	}
 	else if (evt.type == "keyup") {
-		// 當符合前置條件且按鍵後字數為要求字數，則處理跳下一欄
-		if (text.length == maxlen && auto["cond"]) {
-			auto["cond"] = false;
-			// 換下一個欄位
+		// 當符合前置條件且按鍵後字數為取，則處理跳下一欄
+		if (text.length == maxlen && auto.cond) {
+			auto.cond = false;
+			// 換下一個欄位、由下面統一判斷
+			$(auto["next"]).focus();
+		}else if ( jcurr.attr("name") == "declNo1" && text.length == 2 && !( evt.keyCode == 9 || evt.keyCode == 16 ))
+		{
+			auto.cond = false;
+			// 換下一個欄位、由下面統一判斷
 			$(auto["next"]).focus();
 		}
 	}
@@ -881,10 +901,13 @@ function advConfigDeclNoCompose(evt) {
 		else if (i == 2 && text.length == 0)
 			// 第二節可以不打，自動被空白
 			declno += "  ";
+		else if (i == 2 && text.length == 1)
+			// 第二節打一個空白，自動補2個空白
+			declno += "  ";
 		// <2013/11/12>
 		else if (i == 1 && maxlen == 18)
 			declno = text;
-		// <2013/11/12>	
+		// <2013/11/12>
 		else
 			fail = true;
 	}
@@ -894,50 +917,80 @@ function advConfigDeclNoCompose(evt) {
 
 //<2013/11/05> by tony 修正報單號碼複製功能
 function advConfigDeclNoDblclick(evt) {
-	
+
 	advConfigDeclNoCompose(evt);
-	
+
 	var fields = evt.data["fields"];
 	var field = fields[0].createTextRange();
-	
-	field.execCommand("Copy");
-	field.collapse(false);
+
+	//field.execCommand("Copy");
+	//field.collapse(false);
+	if(window.clipboardData) {
+         var result = window.clipboardData.setData("Text", field.text);
+         if (!result) 
+        	 return false;          
+	 }
 }
 
 //<2013/11/05> by tony 修正報單號碼複製功能
 function advConfigDeclNoClick(evt) {
-	
+
 	var fields = evt.data["fields"];
 	var declno = "";
 	var fail   = false;
 	var jfield = $(fields[1]);
 	if ( jfield.attr("name") == "declNo1" )
 		jfield.attr("maxlength","18");
-	
+
 	if (evt.data["field"])
 		evt.data["field"].select();
 }
 
 //<2013/11/05> by tony 修正報單號碼複製功能
 function advConfigDeclNoPaste(evt) {
-	
+
 	var fields = evt.data["fields"];
 	var declno = "";
 	var fail   = false;
 	var jfield = $(fields[1]);
-	
+
 	// 貼心的做法(複製貼上)
 	var maxlen = jfield.attr("maxlength");
 	var text = jfield.val();
-		
-	if ( text.length == 14 )
+
+	if ( text.length == 13 )
+	{
+		$(fields[1]).val( text.substr(0,2) );
+		$(fields[2]).val( "  " );
+		$(fields[3]).val( text.substr(3,2) );
+		$(fields[4]).val( text.substr(5,3) );
+		$(fields[5]).val( text.substr(8,5) );
+		// STEVE 2015/02/11
+		var new_text;
+		new_text = $(fields[1]).val()+$(fields[2]).val()+$(fields[3]).val()+
+		           $(fields[4]).val()+$(fields[5]).val();
+
+		// 將結果存回合併欄位
+		if ( jfield.attr("name") == "declNoIm1" )
+			$('input#imDeclNo').attr("value", new_text);
+		else if ( jfield.attr("name") == "declNoOrg1" )
+			$('input#orgDeclNo').attr("value", new_text);
+		else{
+			$(fields[0]).val( new_text);
+			$('input#declNo').attr("value", new_text);
+
+			jfield.attr("maxlength","2");
+			$("[name='btn_F6']").trigger('click');
+		}
+
+	}else if ( text.length == 14 )
 	{
 		$(fields[1]).val( text.substr(0,2) );
 		$(fields[2]).val( text.substr(2,2) );
 		$(fields[3]).val( text.substr(4,2) );
 		$(fields[4]).val( text.substr(6,3) );
 		$(fields[5]).val( text.substr(9,5) );
-		
+
 		// 將結果存回合併欄位
 		if ( jfield.attr("name") == "declNoIm1" )
 			$('input#imDeclNo').attr("value", text);
@@ -946,35 +999,72 @@ function advConfigDeclNoPaste(evt) {
 		else{
 			$(fields[0]).val( text);
 			$('input#declNo').attr("value", text);
-	
+
 			jfield.attr("maxlength","2");
 			$("[name='btn_F6']").trigger('click');
 		}
+	}else if ( text.length == 17 )
+	{
+		var dc;
+
+		$(fields[1]).val( text.substr(0,2) );
+		$(fields[2]).val( "  " );
+		$(fields[3]).val( text.substr(5,2) );
+		$(fields[4]).val( text.substr(8,3) );
+		$(fields[5]).val( text.substr(12,5) );
+
+		dc = $("input[name='declNo1']").val() +
+	         $("input[name='declNo2']").val() +
+	         $("input[name='declNo3']").val() +
+	         $("input[name='declNo4']").val() + 
+	         $("input[name='declNo5']").val();
+
+		// 將結果存回合併欄位
+		$(fields[0]).val( dc );
+		$('input#declNo').attr("value", dc);
+
+		jfield.attr("maxlength","2");
+		$("[name='btn_F6']").trigger('click');
 	}else if ( text.length == 18 )
 	{
 		var dc;
-		
+
 		$(fields[1]).val( text.substr(0,2) );
 		$(fields[2]).val( text.substr(3,2) );
 		$(fields[3]).val( text.substr(6,2) );
 		$(fields[4]).val( text.substr(9,3) );
 		$(fields[5]).val( text.substr(13,5) );
-		
+
 		dc = $("input[name='declNo1']").val() +
 		     $("input[name='declNo2']").val() +
 		     $("input[name='declNo3']").val() +
 		     $("input[name='declNo4']").val() + 
 		     $("input[name='declNo5']").val();
-		
+
 		// 將結果存回合併欄位
 		$(fields[0]).val( dc );
 		$('input#declNo').attr("value", dc);
-		
-		jfield.attr("maxlength","2");	
+
+		jfield.attr("maxlength","2");
 		$("[name='btn_F6']").trigger('click');
 	}else
 	{
 		jfield.attr("maxlength","2");
+	}
+}
+
+// <2015/08/31> by tony 用退格鍵(backspace)回到上一欄報單欄位
+function advConfigDeclNoBackspace(evt)
+{
+	var keyCode = evt.keyCode;
+	if ( keyCode == 8 ){
+		var attrName = $( this ).attr( 'name' );
+		var index = attrName.substring( 6, 7);
+
+		if ( !isNaN( parseInt( index ) )  && $( this ).val().length == 0 ) {
+			var preIndex = parseInt( index ) - 1;
+			$( this ).siblings( "input[name='declNo" +  preIndex + "']" ).select();
+		}
 	}
 }
 
@@ -993,14 +1083,39 @@ function advConfigDeclNoPastes(evt)
     	text = e.originalEvent.clipboardData.getData('Text');
     }
     
-	if ( text.length == 14 )
+	if ( text.length == 13 )
+    {
+		$(fields[1]).val( text.substr(0,2) );
+		$(fields[2]).val( "  " );
+		$(fields[3]).val( text.substr(3,2) );
+		$(fields[4]).val( text.substr(5,3) );
+		$(fields[5]).val( text.substr(8,5) );  
+
+		// STEVE 2015/02/11
+		var new_text;
+		new_text = $(fields[1]).val()+$(fields[2]).val()+$(fields[3]).val()+
+		           $(fields[4]).val()+$(fields[5]).val();
+		// 將結果存回合併欄位
+		if ( jfield.attr("name") == "declNoIm1" )
+			$('input#imDeclNo').attr("value", new_text);
+		else if ( jfield.attr("name") == "declNoOrg1" )
+			$('input#orgDeclNo').attr("value", new_text);
+		else{
+			$(fields[0]).val( new_text);
+			$('input#declNo').attr("value", new_text);
+
+			jfield.attr("maxlength","2");
+			$("[name='btn_F6']").trigger('click');
+		}
+
+    }else if ( text.length == 14 )
 	{
 		$(fields[1]).val( text.substr(0,2) );
 		$(fields[2]).val( text.substr(2,2) );
 		$(fields[3]).val( text.substr(4,2) );
 		$(fields[4]).val( text.substr(6,3) );
 		$(fields[5]).val( text.substr(9,5) );
-		
+
 		// 將結果存回合併欄位
 		if ( jfield.attr("name") == "declNoIm1" )
 			$('input#imDeclNo').attr("value", text);
@@ -1013,33 +1128,54 @@ function advConfigDeclNoPastes(evt)
 			jfield.attr("maxlength","2");
 			$("[name='btn_F6']").trigger('click');
 		}
-
-	}else if ( text.length == 18 )
+    }else if ( text.length == 17 )
 	{
 		var dc;
-		
+
 		$(fields[1]).val( text.substr(0,2) );
-		$(fields[2]).val( text.substr(3,2) );
-		$(fields[3]).val( text.substr(6,2) );
-		$(fields[4]).val( text.substr(9,3) );
-		$(fields[5]).val( text.substr(13,5) );
-		
+		$(fields[2]).val( "  " );
+		$(fields[3]).val( text.substr(5,2) );
+		$(fields[4]).val( text.substr(8,3) );
+		$(fields[5]).val( text.substr(12,5) );
+
 		dc = $("input[name='declNo1']").val() +
 		     $("input[name='declNo2']").val() +
 		     $("input[name='declNo3']").val() +
 		     $("input[name='declNo4']").val() + 
 		     $("input[name='declNo5']").val();
-		
+
 		// 將結果存回合併欄位
 		$(fields[0]).val( dc );
 		$('input#declNo').attr("value", dc);
-		
-		jfield.attr("maxlength","2");	
+
+		jfield.attr("maxlength","2");
+		$("[name='btn_F6']").trigger('click');
+	}else if ( text.length == 18 )
+	{
+		var dc;
+
+		$(fields[1]).val( text.substr(0,2) );
+		$(fields[2]).val( text.substr(3,2) );
+		$(fields[3]).val( text.substr(6,2) );
+		$(fields[4]).val( text.substr(9,3) );
+		$(fields[5]).val( text.substr(13,5) );
+
+		dc = $("input[name='declNo1']").val() +
+		     $("input[name='declNo2']").val() +
+		     $("input[name='declNo3']").val() +
+		     $("input[name='declNo4']").val() + 
+		     $("input[name='declNo5']").val();
+
+		// 將結果存回合併欄位
+		$(fields[0]).val( dc );
+		$('input#declNo').attr("value", dc);
+
+		jfield.attr("maxlength","2");
 		$("[name='btn_F6']").trigger('click');
 	}else
 	{
 		jfield.attr("maxlength","2");
-	}	
+	}
 }
 
 function advConfigDeclNoSplit(evt) {
@@ -1134,11 +1270,13 @@ function advConfigSpecDeclNo(jfield, data) {
 		// 加入複製貼上報單號碼的事件(focus)
 		njfield.bind("dblclick", { "fields": fields }, advConfigDeclNoDblclick);
 		// 加入複製貼上報單號碼的事件(paste)
-		njfield.bind("paste", { "fields": fields }, advConfigDeclNoPastes);		
+		njfield.bind("paste", { "fields": fields }, advConfigDeclNoPastes);
 		// 加入點入時全選事件
 		//<2013/11/12> by Tanek 將欄位設為focus後就將其設為全選與max length為18
 		njfield.bind("focus", { "field": njfield , "fields": fields }, advConfigDeclNoClick );
 		//<2013/11/12>
+		// <2015/08/31> by tony 用退格鍵(backspace)回到上一欄報單欄位
+		njfield.bind("keydown", { "fields": fields }, advConfigDeclNoBackspace);		
 	}
 }
 
@@ -1283,6 +1421,10 @@ function advConfigRegisterField(jfield) {
 				continue;
 			// 依條件類別分別塞入個別限制中
 			var cond = singleCond.match(/(\w+)(\(([\w,]+)\))?:(.*)/);
+			//20210324 by john for chk()
+			if(!cond)
+    			if("chk"==singleCond.substring(0,3))
+        			cond="chk"
 			if (cond) {
 				var dir = cond[1];
 				var scenario = cond[3];
@@ -1445,7 +1587,7 @@ function advConfigRegister(root) {
 	$.each(root.find("input,textarea,select"), function(key, field) {
 		advConfigRegisterField($(field));
 	});
-	
+
 	// 加入狀態列按鈕功能
 	root.find("button[name='getStatus']").bind("click", {}, advConfigStatusOnClick);
 

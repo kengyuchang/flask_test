@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <link rel="stylesheet" href="static/css/acod.css"/>
-    <script src="https://code.jquery.com/jquery-1.12.4.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-1.8.3.min.js" type="text/javascript"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <script type="text/javascript"
         src="{{ url_for('static', filename='js/commons/adv/advconfig.js') }}"></script>
@@ -19,7 +19,7 @@
         src="{{ url_for('static', filename='js/commons/adv/advgeneral.js') }}"></script>
     <script type="text/javascript">
     function clickMe() { 
-        var url ='/getfuncb'
+        var url ='/getfunca'
         if (advConfigModCheck("query", true)){
 				return;
 			}
@@ -86,7 +86,7 @@
                 </td>
                 <td>
                     <input type="text"  name="qProjectNo" id="qProjectNo" size="20" maxlength="20" >
-                    <div class="acod">desc:專案代號 chk(query):string(1..20) tr:upper  to:query bi:keep</div>
+                    <div class="acod">desc:專案代號 chk(query):string(1..1) tr:upper  to:query bi:keep</div>
                 </td>
             </tr>
         </table>
@@ -118,16 +118,8 @@
         <s:hidden name="_advPaneBackup_" />
         <s:hidden name="libraCopy" />
         <div class="acod"> bi:query</div>
-        
-             <div style="position: relative; width: 290px; text-align:left;">
-             <tr>
-            <td>
-				處理訊息
-			</td>
-			<td>
-                 <input id="statusMsg" type="text" size="100" class="msgText error" readonly="readonly"></input>
-            </td>  
-            </tr>
+        {% include 'status.html' %}
+
         </div>
     </div>
 
