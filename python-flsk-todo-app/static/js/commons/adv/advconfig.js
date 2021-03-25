@@ -1421,10 +1421,6 @@ function advConfigRegisterField(jfield) {
 				continue;
 			// 依條件類別分別塞入個別限制中
 			var cond = singleCond.match(/(\w+)(\(([\w,]+)\))?:(.*)/);
-			//20210324 by john for chk()
-			if(!cond)
-    			if("chk"==singleCond.substring(0,3))
-        			cond="chk"
 			if (cond) {
 				var dir = cond[1];
 				var scenario = cond[3];

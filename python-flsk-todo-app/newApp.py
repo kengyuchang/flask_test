@@ -18,22 +18,37 @@ def index():
 def getFuncB():
     #results = [{"b":"20","sfsname":"2"},{}]
     sql="""    
-			select npr.專案代號 \
-			from  OUTBOUND.[dbo].[Notice_Project_Registry] npr\
-			left join  OUTBOUND.[dbo].[Notice_SMS] sms on npr.專案代號 = sms.專案代號\
-			left join  OUTBOUND.[dbo].Notice_App_Push aph on npr.專案代號 = aph.專案代號\
-        where npr.停用 ='N'\
-        order by 專案負責人\
+        	   SELECT TOP (1000) 
+              [專案代號]
+        	  ,專案說明
+              ,通知方式
+        	  ,專案開始日
+        	  ,專案結束日
+        	  ,專案負責人
+        	  ,停用
+          FROM [NEW_OUTBOUND].[dbo].[訊息主檔] where
     """
-    conn =GenericMainProgram.getDBConnection('3-123', 'OUTBOUND', 15)
+    conn =GenericMainProgram.getDBConnection('3-125', 'NEW_OUTBOUND', 15)
     df =pd.read_sql(sql, conn)
 
     #dic=GenericMainProgram.executeSQLInOut(sql,'3-123', 'OUTBOUND', 15)
     #df= pd.DataFrame(dic)
-    rename_dic={"專案代號":"if01ColProjectNo"}
-    cc=df['專案代號'].values.tolist()
+    rename_dic={"專案代號":"if01ColG1ProjectNo"
+                ,"專案說明":"if01ColG1ProjectDesc"
+                ,"通知方式":"if01ColG1Notice"
+                ,"專案說明":"if01ColG1ProjectDesc"
+                ,"專案說明":"if01ColG1ProjectDesc"
+                ,"專案說明":"if01ColG1ProjectDesc"
+                ,"專案說明":"if01ColG1ProjectDesc"
+                }
     res2 =df.rename(rename_dic, axis=1).to_dict()
-    res2["if01ColProjectNo"]=cc
+    res2["if01ColG1ProjectNo"]    =df['專案代號'].values.tolist()
+    res2["if01ColG1ProjectDesc"]  =df['專案說明'].values.tolist()
+    res2["if01ColG1Notice"]  =df['通知方式'].values.tolist()
+    res2["if01ColG1ProjectBeginDay"]  =df['專案開始日'].values.tolist()
+    res2["if01ProjectEndDay"]  =df['專案結束日'].values.tolist()
+    res2["if01ColG1ProjectDesc"]  =df['專案負責人'].values.tolist()
+    res2["if01ProjectStop"]  =df['停用'].values.tolist()
     res2["if01Begin"]="0"
     res2["if01Count"]=str(df.size)
     res2["if01Total"]=str(df.size)

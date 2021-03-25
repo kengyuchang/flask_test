@@ -2,26 +2,12 @@
 </script>  
 <table width="100%" border="0" align="left" cellpadding="1" cellspacing="0" class="statusArea">
 	<tr>
-		<td style="width: 125px;">
-			<input id="btn_status" type="button" class="btnFixed" value='<s:text name="button.status"/>'>
+		<td>
+			<input id="btn_status" type="button" value='狀態'>
 		</td>
 		<td>
-			<s:if test="hasActionMessages()">
-				<input id="statusMsg" type="text" value='<s:property value="actionMessages"/>' class="msgText msg" readonly="readonly"></input>       
-			</s:if>
+			<input id="statusMsg" type="text" size="100"  readonly="readonly"></input>       
 			<div id="jsonMsg" style="display:none">
-				<s:if test="hasActionMessages()">
-					<s:iterator value="actionMessages">
-						<li><s:property value="value"/></li>
-					</s:iterator>
-					<li><s:property value="actionMessages"/></li>       
-				</s:if>
-				<s:if test="hasFieldErrors()">
-					<s:iterator value="fieldErrors">
-				    	<li><s:property value="value"/></li>
-				    </s:iterator>
-			   </s:if>
-	    	</div>
-		</td>
+	    </div>
 	</tr>
 </table>
