@@ -18,15 +18,15 @@ def index():
 def getFuncB():
     #results = [{"b":"20","sfsname":"2"},{}]
     sql="""    
-        	   SELECT TOP (1000) 
+        	      SELECT TOP (1000) 
               [專案代號]
         	  ,專案說明
               ,通知方式
-        	  ,專案開始日
-        	  ,專案結束日
+		 , convert(varchar(25), 專案開始日, 111) as 專案開始日
+		  , convert(varchar(25), 專案結束日, 111) as 專案結束日
         	  ,專案負責人
         	  ,停用
-          FROM [NEW_OUTBOUND].[dbo].[訊息主檔] where
+          FROM [NEW_OUTBOUND].[dbo].[訊息主檔] where 1=1
     """
     conn =GenericMainProgram.getDBConnection('3-125', 'NEW_OUTBOUND', 15)
     df =pd.read_sql(sql, conn)
@@ -36,30 +36,26 @@ def getFuncB():
     rename_dic={"專案代號":"if01ColG1ProjectNo"
                 ,"專案說明":"if01ColG1ProjectDesc"
                 ,"通知方式":"if01ColG1Notice"
-                ,"專案說明":"if01ColG1ProjectDesc"
-                ,"專案說明":"if01ColG1ProjectDesc"
-                ,"專案說明":"if01ColG1ProjectDesc"
-                ,"專案說明":"if01ColG1ProjectDesc"
+                ,"專案開始日":"if01ColG1ProjectBeginDay"
+                ,"專案結束日":"if01ColG1ProjectEndDay"
+                ,"專案負責人":"if01ColG1ProjectUser"
+                ,"停用":"if01ColG1ProjectStop"
                 }
     res2 =df.rename(rename_dic, axis=1).to_dict()
     res2["if01ColG1ProjectNo"]    =df['專案代號'].values.tolist()
     res2["if01ColG1ProjectDesc"]  =df['專案說明'].values.tolist()
     res2["if01ColG1Notice"]  =df['通知方式'].values.tolist()
     res2["if01ColG1ProjectBeginDay"]  =df['專案開始日'].values.tolist()
-    res2["if01ProjectEndDay"]  =df['專案結束日'].values.tolist()
-    res2["if01ColG1ProjectDesc"]  =df['專案負責人'].values.tolist()
-    res2["if01ProjectStop"]  =df['停用'].values.tolist()
+    res2["if01ColG1ProjectEndDay"]  =df['專案結束日'].values.tolist()
+    res2["if01ColG1ProjectUser"]  =df['專案負責人'].values.tolist()
+    res2["if01ColG1ProjectStop"]  =df['停用'].values.tolist()
     res2["if01Begin"]="0"
     res2["if01Count"]=str(df.size)
     res2["if01Total"]=str(df.size)
     res2["if01View"]=""
     res2["if01Type"]=""
-    res2["sfsname"]=3
-    res2["b"]=30
-    res2["a"]=100
 
-
-
+    conn.close()
     return jsonify(res2)
 
 @app.route('/getfunca')

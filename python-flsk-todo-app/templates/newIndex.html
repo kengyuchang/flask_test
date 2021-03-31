@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-    <link rel="stylesheet" href="static/css/acod.css"/>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery/jquery-1.8.3.min.js') }}"></script>
+    <link rel="stylesheet" href="static/css/acod.css"/>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <!--<script src="https://code.jquery.com/jquery-1.8.3.min.js" type="text/javascript"></script>-->
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/commons/adv/advconfig.js') }}"></script>
@@ -59,8 +61,10 @@
  
     </script>
   <head>
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+  	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>demo</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
     <div class="container">
@@ -128,7 +132,7 @@
                  </td>
              </tr>
         </table>
-
+        <dir>
         <table id="grid01">
         <tr>
             <th><label style="display: inline-block; width: 70px;">序號</label></th>
@@ -147,6 +151,7 @@
 			<td nowrap><label style="display: inline-block; width: 160px;" name="g1Notice"></label></td>
 			<td nowrap><label style="display: inline-block; width: 160px;" name="g1ProjectBeginDay"></label></td>
 			<td nowrap><label style="display: inline-block; width: 160px;" name="g1ProjectEndDay"></label></td>
+			<td nowrap><label style="display: inline-block; width: 160px;" name="g1ProjectUser"></label></td>
 			<td nowrap><label style="display: inline-block; width: 60px;" name="g1ProjectStop"></label></td>
 	    </tr>
         </table>
@@ -155,11 +160,11 @@
             <table class="ctv"></table>
             <div class="acod">grid:fixrow(if01)</div>
         </div>
-        <div style="position: relative; width: 1100px; height: 310px; overflow-x: auto; overflow-y: scroll;">
+        <div style="position: relative; width: 1200px; height: 310px; overflow-x: auto; overflow-y: scroll;">
                     <table class="ctv" ></table>
                     <div class="acod">grid:table(if01);attr(reqAll);pgrow(0)  fr:query bi:update</div>
         </div>
-        <div class="ctvTitle" style="position: relative; width: 1100px; text-align: right;">
+        <div class="ctvTitle" style="position: relative; width: 1200px; text-align: right;">
             共&nbsp;<span id="edCnt"></span><div class="acod">grid:rowcnt(if01)</div>&nbsp;筆&nbsp;
         </div>
         <div style="position: relative; width: 290px; text-align:left;">

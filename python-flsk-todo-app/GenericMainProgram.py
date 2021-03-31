@@ -1,10 +1,12 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Created on Wed Dec 25 15:17:09 2019
 
 @author: F126191299
 """
 import pymssql
+import psycopg2
+import mysql.connector
 import pandas as pd
 import config
 import smtplib, ssl
@@ -67,16 +69,38 @@ class GenericMainProgram:
         if timOut > intimOut:
             intimOut = timOut
         dictx = config.DB_conn
-        conn = pymssql.connect(
-            server=dictx[dbType + '_server'],
-            #user=dictx[dbType+'_user'],
-            #password=dictx[dbType+'_password'],
-            database=dbName,
-            timeout=intimOut,
-            as_dict=True,
-            charset='utf8'
-        )
-        conn.autocommit(True)
+        if  dictx[dbType + '_DB']=="MS":
+            conn = pymssql.connect(
+                server=dictx[dbType + '_server'],
+                #user=dictx[dbType+'_user'],
+                #password=dictx[dbType+'_password'],
+                database=dbName,
+                timeout=intimOut,
+                as_dict=True,
+                charset='utf8'
+            )
+            conn.autocommit(True)
+        elif dictx[dbType + '_DB']=="PG":
+            conn = psycopg2.connect(
+                host=dictx[dbType + '_server'],
+                port="5432",
+                user=dictx[dbType+'_user'],
+                password=dictx[dbType+'_password'],
+                database=dbName,
+                connect_timeout=intimOut,
+            )
+            conn.set_client_encoding('UTF8')
+            conn.autocommit=True
+        elif dictx[dbType + '_DB']=="MY":
+            conn =  mysql.connector.connect(
+                host=dictx[dbType + '_server'],
+                user=dictx[dbType+'_user'],
+                password=dictx[dbType+'_password'],
+                database=dbName,
+                connect_timeout=intimOut,
+                charset='utf8'
+            )
+            conn.autocommit=True
         return conn
 
     def executeSQLWithConn(conn, sql):
@@ -195,10 +219,16 @@ class GenericMainProgram:
         #conn1 =GenericMainProgram.getDBConnection('125','DB_MANAGE',300)
         #sql ='select top 20 * from DB_MANAGE.dbo.執行序列 '
         #datas = pd.read_sql(sql, conn1)
+        sql="""    
+        	SELECT idno FROM gatewayct.mpasslog limit 10;
+        """
+        conn =GenericMainProgram.getDBConnection('4-42', 'gatewayct', 15)
+        df =pd.read_sql(sql, conn)
         if GenericMainProgram.checkIsTradeDay():
             print('true')
         else:
             print('false')
+        conn.close()
         #GenericMainProgram.sendMail('SECSVR3-125 Python RunProcess_error','cyndi',['kengyu.c@cathaysec.com.tw'])
 
 #runPrgram
